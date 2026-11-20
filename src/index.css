@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primitive Decomposed OKLCH Coordinates (DESIGN.md) */
+  --studio-slate-50-raw: 0.98 0.005 260;
+  --studio-slate-100-raw: 0.94 0.008 260;
+  --studio-slate-200-raw: 0.88 0.012 260;
+  --studio-slate-700-raw: 0.36 0.022 260;
+  --studio-slate-900-raw: 0.16 0.025 260;
+  --studio-brand-600-raw: 0.51 0.195 264;
+  --studio-brand-700-raw: 0.44 0.185 264;
+  --studio-emerald-600-raw: 0.58 0.165 152;
+  --studio-amber-600-raw: 0.62 0.160 68;
+  --studio-rose-600-raw: 0.55 0.210 18;
+
+  /* Semantic Color Tokens */
+  --color-bg-canvas: oklch(var(--studio-slate-50-raw));
+  --color-bg-surface: oklch(1 0 0);
+  --color-bg-elevated: oklch(var(--studio-slate-100-raw));
+  --color-border-subtle: oklch(var(--studio-slate-200-raw));
+  --color-text-primary: oklch(var(--studio-slate-900-raw));
+  --color-text-muted: oklch(var(--studio-slate-700-raw));
+  --color-brand-primary: oklch(var(--studio-brand-600-raw));
+  --color-brand-hover: oklch(var(--studio-brand-700-raw));
+  --color-status-success: oklch(var(--studio-emerald-600-raw));
+  --color-status-warning: oklch(var(--studio-amber-600-raw));
+  --color-status-error: oklch(var(--studio-rose-600-raw));
+
+  /* Fluid Typography Scales (Minimum Floor: 0.75rem / 12px) */
+  --fs-h1: clamp(1.75rem, 1.35rem + 1.8vw, 2.75rem);
+  --fs-h2: clamp(1.25rem, 1.08rem + 0.85vw, 1.75rem);
+  --fs-h3: clamp(1.0rem, 0.95rem + 0.3vw, 1.2rem);
+  --fs-body: clamp(0.875rem, 0.84rem + 0.15vw, 1.0rem);
+  --fs-small: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);
+
+  /* 4px Base Spatial Grid */
+  --space-xs: 0.25rem;
+  --space-sm: clamp(0.5rem, 0.41rem + 0.38vw, 0.75rem);
+  --space-md: clamp(1.0rem, 0.82rem + 0.75vw, 1.5rem);
+  --space-lg: clamp(1.5rem, 0.97rem + 2.25vw, 3.0rem);
+  --space-xl: clamp(2.0rem, 0.94rem + 4.51vw, 5.0rem);
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mandatory Keyboard Accessibility Outline (DESIGN.md) */
+:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+/* Mandatory Reduced Motion Support (DESIGN.md & accessibility-contrast-auditor) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

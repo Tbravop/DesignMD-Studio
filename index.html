@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DesignMD Studio — Google Stitch Design System Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/index.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.3.1",
+          "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+          "lucide-react": "https://esm.sh/lucide-react@0.454.0?deps=react@18.3.1"
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              canvas: 'var(--color-bg-canvas)',
+              surface: 'var(--color-bg-surface)',
+              elevated: 'var(--color-bg-elevated)',
+              'border-subtle': 'var(--color-border-subtle)',
+              'ink-primary': 'var(--color-text-primary)',
+              'ink-muted': 'var(--color-text-muted)',
+              brand: {
+                primary: 'var(--color-brand-primary)',
+                hover: 'var(--color-brand-hover)',
+              },
+              status: {
+                success: 'var(--color-status-success)',
+                warning: 'var(--color-status-warning)',
+                error: 'var(--color-status-error)',
+              },
+            },
+            fontSize: {
+              h1: 'var(--fs-h1)',
+              h2: 'var(--fs-h2)',
+              h3: 'var(--fs-h3)',
+              body: 'var(--fs-body)',
+              small: 'var(--fs-small)',
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Native Vite Entrypoint + Automatic Static-Server Fallback Transpiler -->
+    <script type="module">
+      async function bootApplication() {
+        // Check if running under Vite dev server without triggering a 404 request
+        if (window.__vite_plugin_react_preamble_installed__) {
+          await import('/src/main.tsx');
+          return;
+        }
+
+        // Load Babel Standalone for browser-native TypeScript + TSX execution
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://unpkg.com/@babel/standalone@7.26.2/babel.min.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+
+        const MODULE_ORDER = [
+          '/src/utils/colorEngine.ts',
+          '/src/data/archetypes.ts',
+          '/src/utils/extractors.ts',
+          '/src/utils/markdownCompiler.ts',
+          '/src/components/studio/templates/WebLandingTemplate.tsx',
+          '/src/components/studio/templates/DashboardTemplate.tsx',
+          '/src/components/studio/templates/SocialPostTemplate.tsx',
+          '/src/components/studio/templates/BroadcastOverlayTemplate.tsx',
+          '/src/components/studio/StudioHeader.tsx',
+          '/src/components/studio/StudioSidebar.tsx',
+          '/src/components/studio/PreviewCanvas.tsx',
+          '/src/components/studio/MarkdownModal.tsx',
+          '/src/components/hub/IngestionHub.tsx',
+          '/src/App.tsx',
+          '/src/main.tsx',
+        ];
+
+        function resolveRelativePath(fromFile, relativeImport) {
+          const parts = fromFile.split('/').filter(Boolean).slice(0, -1);
+          for (const seg of relativeImport.split('/')) {
+            if (seg === '.' || seg === '') continue;
+            if (seg === '..') parts.pop();
+            else parts.push(seg);
+          }
+          const base = '/' + parts.join('/');
+          for (const candidate of [base, base + '.ts', base + '.tsx']) {
+            if (MODULE_ORDER.includes(candidate)) return candidate;
+          }
+          return base;
+        }
+
+        const blobUrls = {};
+
+        for (const modPath of MODULE_ORDER) {
+          const resp = await fetch(modPath);
+          let source = await resp.text();
+
+          // Strip CSS side-effect imports in JS
+          source = source.replace(/import\s+['"][^'"]+\.css['"];?/g, '');
+
+          // Transpile TypeScript + JSX while preserving ES module imports/exports
+          const compiled = window.Babel.transform(source, {
+            filename: modPath,
+            presets: [
+              ['typescript', { isTSX: modPath.endsWith('.tsx'), allExtensions: true }],
+              ['react', { runtime: 'classic' }],
+            ],
+          }).code;
+
+          // Rewrite relative module paths to their compiled Blob URLs
+          const rewritten = compiled.replace(
+            /(from\s+['"])(\.[^'"]+)(['"])/g,
+            (full, prefix, rel, suffix) => {
+              const target = resolveRelativePath(modPath, rel);
+              const mapped = blobUrls[target] || target;
+              return `${prefix}${mapped}${suffix}`;
+            }
+          );
+
+          const blob = new Blob([rewritten], { type: 'application/javascript' });
+          blobUrls[modPath] = URL.createObjectURL(blob);
+        }
+
+        await import(blobUrls['/src/main.tsx']);
+      }
+
+      bootApplication().catch((err) => {
+        console.error('Boot error:', err);
+      });
+    </script>
+  </body>
+</html>
