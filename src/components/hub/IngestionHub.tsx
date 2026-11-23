@@ -414,7 +414,7 @@ export function IngestionHub({
                     })}
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="hidden sm:flex items-center gap-2">
                     {wizardStep > 1 && (
                       <button
                         type="button"
@@ -734,7 +734,7 @@ export function IngestionHub({
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2">
+                              <div className="hidden sm:flex items-center gap-2">
                                 <Icon
                                   className="w-5 h-5 text-brand-primary shrink-0"
                                   aria-hidden="true"
@@ -788,6 +788,36 @@ export function IngestionHub({
                     </div>
                   </div>
                 )}
+
+                {/* Mobile Wizard Step Navigation (below form fields) */}
+                <div className="flex sm:hidden items-center justify-end gap-2 pt-3 border-t border-border-subtle">
+                  {wizardStep > 1 && (
+                    <button
+                      type="button"
+                      data-attr="wizard-prev-step-mobile"
+                      onClick={() =>
+                        setWizardStep((prev) => (prev === 3 ? 2 : 1))
+                      }
+                      className="min-h-[44px] px-3 rounded-lg border border-border-subtle bg-canvas text-ink-primary text-xs font-semibold inline-flex items-center gap-1"
+                    >
+                      <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                      <span>Anterior</span>
+                    </button>
+                  )}
+                  {wizardStep < 3 && (
+                    <button
+                      type="button"
+                      data-attr="wizard-next-step-mobile"
+                      onClick={() =>
+                        setWizardStep((prev) => (prev === 1 ? 2 : 3))
+                      }
+                      className="min-h-[44px] px-4 rounded-lg bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold inline-flex items-center gap-1"
+                    >
+                      <span>Siguiente Paso</span>
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 

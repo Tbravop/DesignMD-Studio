@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { IngestionHub } from './components/hub/IngestionHub';
-import { MarkdownModal } from './components/studio/MarkdownModal';
+import {
+  ChannelSelectorColumn,
+  type CanvasChannelSelection,
+} from './components/studio/ChannelSelectorColumn';
+import { ConfigTokensPanel } from './components/studio/ConfigTokensPanel';
+import { OriginRail, type IngestionMode } from './components/studio/OriginRail';
 import { PreviewCanvas } from './components/studio/PreviewCanvas';
-import { StudioHeader } from './components/studio/StudioHeader';
-import { StudioSidebar } from './components/studio/StudioSidebar';
 import {
   ARCHETYPES,
-  type ChannelId,
   type DesignSystemState,
   type TypographyScaleId,
 } from './data/archetypes';
@@ -21,7 +22,7 @@ import { downloadDesignMarkdown } from './utils/markdownCompiler';
 function createInitialState(): DesignSystemState {
   const defaultArch = ARCHETYPES.minimalist;
   return {
-    projectName: 'Aurora Design System',
+    projectName: `${defaultArch.label} — Design System`,
     archetypeId: defaultArch.id,
     seedColor: defaultArch.defaultSeed,
     harmony: defaultArch.defaultHarmony,
@@ -47,9 +48,19 @@ function createInitialState(): DesignSystemState {
 }
 
 export function App(): React.ReactElement {
-  const [currentView, setCurrentView] = useState<'hub' | 'studio'>('hub');
+  const [activeMode, setActiveMode] = useState<IngestionMode>('wizard');
   const [state, setState] = useState<DesignSystemState>(createInitialState);
-  const [isMarkdownModalOpen, setIsMarkdownModalOpen] = useState<boolean>(false);
+  // Column 3 starts closed and unfolds automatically once Block 5 (Geometry) is interacted with
+  const [isChannelColumnOpen, setIsChannelColumnOpen] = useState<boolean>(false);
+  const [selectedChannel, setSelectedChannel] =
+    useState<CanvasChannelSelection>('web-landing');
+
+  const handleSelectOriginMode = (nextMode: IngestionMode) => {
+    if (nextMode !== activeMode) {
+      setActiveMode(nextMode);
+      setIsChannelColumnOpen(false);
+    }
+  };
 
   const handleUpdateState = (patch: Partial<DesignSystemState>) => {
     setState((prev) => ({ ...prev, ...patch }));
@@ -65,6 +76,7 @@ export function App(): React.ReactElement {
     );
     setState((prev) => ({
       ...prev,
+      projectName: `${preset.label} — Design System`,
       archetypeId: preset.id,
       seedColor: preset.defaultSeed,
       harmony: preset.defaultHarmony,
@@ -99,7 +111,10 @@ export function App(): React.ReactElement {
     }));
   };
 
-  const handleUpdateTokenColor = (tokenKey: keyof GeneratedPalette, hexValue: string) => {
+  const handleUpdateTokenColor = (
+    tokenKey: keyof GeneratedPalette,
+    hexValue: string
+  ) => {
     setState((prev) => {
       const updatedPalette = {
         ...prev.palette,
@@ -131,7 +146,10 @@ export function App(): React.ReactElement {
     }));
   };
 
-  const handleUpdateCustomFont = (field: 'heading' | 'body' | 'mono', value: string) => {
+  const handleUpdateCustomFont = (
+    field: 'heading' | 'body' | 'mono',
+    value: string
+  ) => {
     setState((prev) => ({
       ...prev,
       fonts: {
@@ -151,7 +169,9 @@ export function App(): React.ReactElement {
     }));
   };
 
-  const handleUpdateGeometry = (patch: Partial<DesignSystemState['geometry']>) => {
+  const handleUpdateGeometry = (
+    patch: Partial<DesignSystemState['geometry']>
+  ) => {
     setState((prev) => ({
       ...prev,
       geometry: {
@@ -161,23 +181,14 @@ export function App(): React.ReactElement {
     }));
   };
 
-  const handleToggleChannel = (channelId: ChannelId) => {
-    setState((prev) => {
-      const exists = prev.activeChannels.includes(channelId);
-      const nextChannels = exists
-        ? prev.activeChannels.filter((id) => id !== channelId)
-        : [...prev.activeChannels, channelId];
-      return {
-        ...prev,
-        activeChannels: nextChannels,
-      };
-    });
-  };
-
-  const handleEnableAllChannels = () => {
+  const handleSelectChannel = (selection: CanvasChannelSelection) => {
+    setSelectedChannel(selection);
     setState((prev) => ({
       ...prev,
-      activeChannels: ['web-landing', 'dashboard', 'social-post', 'broadcast-overlay'],
+      activeChannels:
+        selection === 'all'
+          ? ['web-landing', 'dashboard', 'social-post', 'broadcast-overlay']
+          : [selection],
     }));
   };
 
@@ -186,52 +197,44 @@ export function App(): React.ReactElement {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-ink-primary flex flex-col">
-      {currentView === 'hub' ? (
-        <IngestionHub
-          state={state}
-          onUpdateState={handleUpdateState}
-          onSelectArchetypePreset={handleSelectArchetypePreset}
-          onUpdateSeedAndHarmony={handleUpdateSeedAndHarmony}
-          onToggleChannel={handleToggleChannel}
-          onEnterStudio={() => setCurrentView('studio')}
-        />
-      ) : (
-        <div className="min-h-screen flex flex-col">
-          <StudioHeader
-            state={state}
-            onUpdateProjectName={(name) => handleUpdateState({ projectName: name })}
-            onToggleChannel={handleToggleChannel}
-            onOpenMarkdownModal={() => setIsMarkdownModalOpen(true)}
-            onDownloadMarkdown={handleDownloadMarkdown}
-            onBackToHub={() => setCurrentView('hub')}
-          />
+    <div className="h-screen w-screen overflow-hidden bg-canvas text-ink-primary flex">
+      {/* Columna 1 — Rail de Origen (64px fijo a la izquierda) */}
+      <OriginRail activeMode={activeMode} onSelectMode={handleSelectOriginMode} />
 
-          <div className="flex-1 flex flex-col lg:flex-row">
-            <StudioSidebar
-              state={state}
-              onUpdateSeedAndHarmony={handleUpdateSeedAndHarmony}
-              onUpdateTokenColor={handleUpdateTokenColor}
-              onSelectArchetypeFonts={handleSelectArchetypeFonts}
-              onUpdateCustomFont={handleUpdateCustomFont}
-              onUpdateTypographyScale={handleUpdateTypographyScale}
-              onUpdateGeometry={handleUpdateGeometry}
-              onResetToArchetype={handleSelectArchetypePreset}
-            />
-
-            <PreviewCanvas
-              state={state}
-              onEnableAllChannels={handleEnableAllChannels}
-            />
-          </div>
-        </div>
-      )}
-
-      <MarkdownModal
+      {/* Columna 2 — Panel de Configuración y Tokens (320px, despliegue progresivo bloque a bloque 1..5) */}
+      <ConfigTokensPanel
+        key={activeMode}
+        activeMode={activeMode}
         state={state}
-        isOpen={isMarkdownModalOpen}
-        onClose={() => setIsMarkdownModalOpen(false)}
-        onDownload={handleDownloadMarkdown}
+        isChannelColumnOpen={isChannelColumnOpen}
+        onUpdateState={handleUpdateState}
+        onSelectArchetypePreset={handleSelectArchetypePreset}
+        onUpdateSeedAndHarmony={handleUpdateSeedAndHarmony}
+        onUpdateTokenColor={handleUpdateTokenColor}
+        onSelectArchetypeFonts={handleSelectArchetypeFonts}
+        onUpdateCustomFont={handleUpdateCustomFont}
+        onUpdateTypographyScale={handleUpdateTypographyScale}
+        onUpdateGeometry={handleUpdateGeometry}
+        onToggleChannelColumn={() => setIsChannelColumnOpen((prev) => !prev)}
+        onAutoOpenChannelColumn={() => setIsChannelColumnOpen(true)}
+      />
+
+      {/* Columna 3 — Selector de Canal / Template (220px, se auto-despliega al completar Bloque 5) */}
+      <ChannelSelectorColumn
+        isVisible={isChannelColumnOpen}
+        selectedChannel={selectedChannel}
+        state={state}
+        onSelectChannel={handleSelectChannel}
+        onCollapse={() => setIsChannelColumnOpen(false)}
+      />
+
+      {/* Columna 4 — Lienzo de Previsualización Live (Siempre visible desde el inicio con Landing Page por defecto) */}
+      <PreviewCanvas
+        state={state}
+        selectedChannel={selectedChannel}
+        isChannelColumnOpen={isChannelColumnOpen}
+        onExpandChannelColumn={() => setIsChannelColumnOpen(true)}
+        onDownloadMarkdown={handleDownloadMarkdown}
       />
     </div>
   );

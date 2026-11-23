@@ -141,13 +141,13 @@ export function BroadcastOverlayTemplate({
       {/* Mandatory 12.5% Bottom Reservation Zone for Live Closed Captions */}
       <div
         style={{
-          height: '12.5%',
+          minHeight: '12.5%',
           borderTop: '2px dashed var(--accent-secondary)',
           backgroundColor: 'var(--bg-surface)',
         }}
-        className="w-full px-4 flex items-center justify-between gap-2 opacity-95"
+        className="w-full px-4 py-1.5 flex items-center justify-between gap-3 opacity-95"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <Subtitles
             className="w-4 h-4 shrink-0"
             style={{ color: 'var(--accent-secondary)' }}
@@ -159,7 +159,7 @@ export function BroadcastOverlayTemplate({
               fontFamily: 'var(--font-mono)',
               color: 'var(--text-primary)',
             }}
-            className="text-xs font-semibold tracking-wide"
+            className="text-xs font-semibold tracking-wide truncate"
           >
             ZONA SEGURA SUBTÍTULOS EN VIVO (12.5% INFERIOR LIBRE DE GRÁFICOS)
           </span>
@@ -171,7 +171,7 @@ export function BroadcastOverlayTemplate({
             fontFamily: 'var(--font-mono)',
             color: 'var(--text-secondary)',
           }}
-          className="text-xs hidden sm:inline"
+          className="text-xs hidden sm:inline whitespace-nowrap shrink-0"
         >
           CC SAFE AREA • 135PX @ 1080P
         </span>

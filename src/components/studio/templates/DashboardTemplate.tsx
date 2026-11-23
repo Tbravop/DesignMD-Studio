@@ -140,7 +140,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
             }}
             className="space-y-2"
           >
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span
                 style={{ color: 'var(--text-secondary)' }}
                 className="text-xs font-medium"
@@ -197,7 +197,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
           }}
           className="lg:col-span-5 flex flex-col justify-between space-y-4"
         >
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h3
               style={{
                 fontFamily: 'var(--font-heading)',
@@ -225,13 +225,13 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
             </div>
           </div>
 
-          <div className="h-36 flex items-end justify-between gap-2 pt-4 px-1">
+          <div className="h-36 flex items-end justify-between gap-1 sm:gap-2 pt-4 px-1 min-w-0 overflow-hidden">
             {BAR_SERIES.map((item) => (
               <div
                 key={item.label}
-                className="flex-1 flex flex-col items-center gap-2 h-full justify-end"
+                className="flex-1 min-w-0 flex flex-col items-center gap-2 h-full justify-end"
               >
-                <div className="w-full flex items-end justify-center gap-1 h-28">
+                <div className="w-full flex items-end justify-center gap-0.5 sm:gap-1 h-28">
                   <div
                     style={{
                       height: `${item.primary}%`,
@@ -239,7 +239,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
                       borderTopLeftRadius: 'var(--radius)',
                       borderTopRightRadius: 'var(--radius)',
                     }}
-                    className="w-3 transition-all duration-200"
+                    className="w-2 sm:w-3 transition-all duration-200"
                     title={`${item.label} Primario: ${item.primary}%`}
                   />
                   <div
@@ -249,7 +249,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
                       borderTopLeftRadius: 'var(--radius)',
                       borderTopRightRadius: 'var(--radius)',
                     }}
-                    className="w-3 transition-all duration-200"
+                    className="w-2 sm:w-3 transition-all duration-200"
                     title={`${item.label} Secundario: ${item.secondary}%`}
                   />
                 </div>
@@ -259,7 +259,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
                     fontFamily: 'var(--font-mono)',
                     color: 'var(--text-secondary)',
                   }}
-                  className="text-xs"
+                  className="text-[10px] sm:text-[11px] truncate max-w-full"
                 >
                   {item.label}
                 </span>
@@ -279,7 +279,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
           }}
           className="lg:col-span-7 overflow-x-auto"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
             <h3
               style={{
                 fontFamily: 'var(--font-heading)',
@@ -295,7 +295,7 @@ export function DashboardTemplate({ projectName }: DashboardTemplateProps): Reac
                 fontFamily: 'var(--font-mono)',
                 color: 'var(--text-secondary)',
               }}
-              className="text-xs"
+              className="text-xs whitespace-nowrap shrink-0"
             >
               3/3 ACTIVOS
             </span>

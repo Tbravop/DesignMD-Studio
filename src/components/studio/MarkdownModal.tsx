@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, Copy, Download, FileCode2, X } from 'lucide-react';
 import type { DesignSystemState } from '../../data/archetypes';
 import { compileDesignMarkdown } from '../../utils/markdownCompiler';
@@ -17,6 +17,24 @@ export function MarkdownModal({
   onDownload,
 }: MarkdownModalProps): React.ReactElement | null {
   const [copied, setCopied] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      previousFocus?.focus?.();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -92,6 +110,7 @@ export function MarkdownModal({
             </button>
 
             <button
+              ref={closeButtonRef}
               type="button"
               data-attr="modal-close-markdown"
               onClick={onClose}

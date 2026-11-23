@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/src/index.css" />
+    <link rel="stylesheet" href="./src/index.css" />
     <script type="importmap">
       {
         "imports": {
@@ -58,16 +58,21 @@
   <body>
     <div id="root"></div>
 
-    <!-- Native Vite Entrypoint + Automatic Static-Server Fallback Transpiler -->
+    <!-- Native Vite Entrypoint + Static GitHub Pages Root Transpiler -->
     <script type="module">
       async function bootApplication() {
-        // Check if running under Vite dev server without triggering a 404 request
-        if (window.__vite_plugin_react_preamble_installed__) {
-          await import('/src/main.tsx');
+        const isViteEnvironment = Boolean(
+          typeof import.meta.env !== 'undefined' ||
+            window.__vite_plugin_react_preamble_installed__ ||
+            document.querySelector('script[src*="@vite/client"]')
+        );
+
+        if (isViteEnvironment) {
+          await import('./src/main.tsx');
           return;
         }
 
-        // Load Babel Standalone for browser-native TypeScript + TSX execution
+        // Static server / GitHub Pages (main branch root) browser-native TypeScript + TSX loader
         await new Promise((resolve, reject) => {
           const s = document.createElement('script');
           s.src = 'https://unpkg.com/@babel/standalone@7.26.2/babel.min.js';
@@ -85,11 +90,10 @@
           '/src/components/studio/templates/DashboardTemplate.tsx',
           '/src/components/studio/templates/SocialPostTemplate.tsx',
           '/src/components/studio/templates/BroadcastOverlayTemplate.tsx',
-          '/src/components/studio/StudioHeader.tsx',
-          '/src/components/studio/StudioSidebar.tsx',
+          '/src/components/studio/OriginRail.tsx',
+          '/src/components/studio/ChannelSelectorColumn.tsx',
+          '/src/components/studio/ConfigTokensPanel.tsx',
           '/src/components/studio/PreviewCanvas.tsx',
-          '/src/components/studio/MarkdownModal.tsx',
-          '/src/components/hub/IngestionHub.tsx',
           '/src/App.tsx',
           '/src/main.tsx',
         ];
@@ -111,7 +115,11 @@
         const blobUrls = {};
 
         for (const modPath of MODULE_ORDER) {
-          const resp = await fetch(modPath);
+          const fetchUrl = '.' + modPath;
+          const resp = await fetch(fetchUrl);
+          if (!resp.ok) {
+            throw new Error(`Failed to fetch ${fetchUrl} (${resp.status})`);
+          }
           let source = await resp.text();
 
           // Strip CSS side-effect imports in JS

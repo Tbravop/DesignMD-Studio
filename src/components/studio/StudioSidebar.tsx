@@ -112,7 +112,7 @@ export function StudioSidebar({
   return (
     <aside
       aria-label="Controles visuales sin código"
-      className="w-full lg:w-96 shrink-0 bg-surface border-b lg:border-b-0 lg:border-r border-border-subtle flex flex-col"
+      className="w-full lg:w-96 shrink-0 bg-surface border-b lg:border-b-0 lg:border-r border-border-subtle flex flex-col lg:sticky lg:top-[61px] lg:self-start lg:max-h-[calc(100vh-61px)]"
     >
       {/* Top Tab Bar */}
       <div
@@ -170,7 +170,7 @@ export function StudioSidebar({
       </div>
 
       {/* Tab Content Panel */}
-      <div className="p-4 space-y-5 overflow-y-auto max-h-[calc(100vh-130px)]">
+      <div className="p-4 space-y-5 lg:overflow-y-auto lg:flex-1">
         {/* TAB 1: COLORES */}
         {activeTab === 'colors' && (
           <div className="space-y-5">

@@ -24,11 +24,11 @@ export function SocialPostTemplate({
         boxShadow: 'var(--shadow)',
         padding: 'var(--density-pad)',
       }}
-      className="flex flex-col justify-between aspect-square w-full max-w-[460px] mx-auto relative overflow-hidden transition-colors duration-150"
+      className="flex flex-col justify-between min-h-[460px] w-full max-w-[460px] mx-auto relative overflow-hidden transition-colors duration-150"
     >
       {/* Top Meta Row */}
-      <header className="flex items-center justify-between gap-2 z-10">
-        <div className="inline-flex items-center gap-2">
+      <header className="flex items-center justify-between gap-2 z-10 min-w-0">
+        <div className="inline-flex items-center gap-2 min-w-0">
           <Compass
             className="w-4 h-4 shrink-0"
             style={{ color: 'var(--brand-primary)' }}
@@ -40,7 +40,7 @@ export function SocialPostTemplate({
               fontFamily: 'var(--font-mono)',
               color: 'var(--text-primary)',
             }}
-            className="text-xs font-bold tracking-wider uppercase"
+            className="text-xs font-bold tracking-wider uppercase truncate"
           >
             {projectName}
           </span>
@@ -55,14 +55,14 @@ export function SocialPostTemplate({
             borderRadius: 'var(--radius)',
             border: 'var(--border-width) solid var(--border-color)',
           }}
-          className="text-xs px-2.5 py-1 font-semibold"
+          className="text-xs px-2.5 py-1 font-semibold whitespace-nowrap shrink-0"
         >
           01 / 04 • 1080×1080
         </span>
       </header>
 
       {/* Main Focal Point */}
-      <div className="my-auto py-4 space-y-4 z-10">
+      <div className="my-auto py-3 space-y-3 z-10">
         <div
           translate="no"
           style={{
